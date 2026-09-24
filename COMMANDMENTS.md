@@ -1,7 +1,9 @@
 # Eceni Commandments
 
-**Governance baseline:** 1.0.0  
-**Adopted:** 23 September 2026  
+**Introduced in Governance baseline:** 1.0.0
+
+**Adopted:** 23 September 2026
+
 **Scope:** All Eceni product and engineering work, whether performed by people, agents or automation
 
 ## Purpose and authority
@@ -37,7 +39,7 @@ Eceni's design authority may amend the Commandments through an explicit, reasone
 
 ### Projects retain their Governance lineage
 
-Every project must identify its current Eceni Governance baseline and retain its Governance lineage: the baseline under which it was created, every subsequently adopted baseline, and the decision by which each transition was made. A transition records material applicability decisions, governed exceptions and migration work rather than merely changing a version number.
+Every project must identify its current Eceni Governance baseline and retain its Governance lineage. [GOV-003](LAWS.md#gov-003--projects-retain-their-governance-lineage) defines the concrete record required for each transition.
 
 ## 1. Bounded Autonomy
 
