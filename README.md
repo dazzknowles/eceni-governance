@@ -2,7 +2,7 @@
 
 The canonical source of governance for Eceni product and engineering work.
 
-The current Eceni Governance baseline is **1.1.0**, adopted on 24 September 2026.
+The current Eceni Governance baseline is **1.2.0**, adopted on 24 September 2026.
 
 ## Documents
 
@@ -19,3 +19,4 @@ Culture is general and aspirational. The Commandments make its essential boundar
 
 - **1.0.0 — 23 September 2026:** Engineering Culture and Eceni Commandments.
 - **1.1.0 — 24 September 2026:** Initial Laws, Check catalogue, and C# and MariaDB implementation guides.
+- **1.2.0 — 24 September 2026:** Technology foundations require explicit authority where no adopted project or portfolio default exists.

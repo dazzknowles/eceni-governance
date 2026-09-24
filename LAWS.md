@@ -419,3 +419,43 @@ Formatters, analysers, linters and structural tests should enforce objective rul
 ### Basis
 
 Implements [**Build Quality In**](COMMANDMENTS.md#6-build-quality-in), [**Pay for a Lesson Once**](COMMANDMENTS.md#5-pay-for-a-lesson-once) and [**Value Over Waste**](COMMANDMENTS.md#4-value-over-waste) by making known-good implementation decisions reusable while allowing evidence-backed evolution.
+
+## QUA-002 — Technology Foundations Require Explicit Authority
+
+**Introduced in Governance baseline:** 1.2.0
+
+> Where the applicable specification or project record does not define a technology choice, an agent must not establish a durable technology dependency by assumption. It must use an already-authorised project or portfolio default or obtain a decision from the design authority before implementation.
+
+A technology is not authorised merely because it is familiar, conventional, quick to implement or technically suitable. Apply the following order:
+
+1. Use the technology required by the authoritative specification or work item.
+2. Otherwise use an applicable, explicitly adopted project or portfolio default.
+3. Where neither exists, ask the design authority to decide before creating a durable dependency.
+
+The decision request should be proportionate. It should normally identify the recommended choice, material alternatives and the consequences that distinguish them, such as build and runtime requirements, deployment and operations, security, privacy, licensing, cost, maintainability, available skills, portability and interoperability.
+
+Once a technology baseline has been authorised, agents retain autonomy over ordinary implementation choices within it, subject to the other applicable Laws and guides. Projects should record reusable defaults so the same settled question is not repeatedly raised.
+
+### Applicability
+
+Choices that create or materially change a maintained dependency on a programming language, runtime, application framework, database technology, deployment platform, external service or similarly consequential component. It applies particularly to the first executable implementation in a repository and to prototypes intended to be merged, deployed or maintained.
+
+An incidental implementation detail within an authorised stack does not require a separate decision merely because alternatives exist.
+
+### Exceptions
+
+Design authority may authorise a time-bounded exploratory spike before selecting a technology. The spike must be identified as disposable, state what it is intended to learn and must not silently become the maintained implementation, merge baseline or production dependency.
+
+Where an external constraint leaves no genuine technology choice, record the constraint and its authoritative source rather than manufacturing an approval question. Emergency departures follow GOV-001 and do not create an enduring default without subsequent review.
+
+### Required evidence
+
+The authoritative specification, adopted default or design-authority decision; the scope of the choice; material rationale and consequences; and any reassessment trigger required by GOV-002.
+
+### Checks
+
+Automation may detect the introduction of new language, runtime, framework, database, service or deployment manifests and require a reference to the applicable authority. Because repository artefacts do not reliably reveal whether a choice is consequential or already imposed, ambiguous cases require review rather than automatic rejection.
+
+### Basis
+
+Implements [**Bounded Autonomy**](COMMANDMENTS.md#1-bounded-autonomy), [**Pay for a Lesson Once**](COMMANDMENTS.md#5-pay-for-a-lesson-once) and [**Build Quality In**](COMMANDMENTS.md#6-build-quality-in). The [first Eceni Harness slice](https://github.com/dazzknowles/eceni-harness/commit/3e9ea51) demonstrated the gap by establishing Python as a maintained runtime without a Harness technology baseline or an explicit design-authority decision. The implementation may be useful, but suitability after the choice is not authority to make it.
