@@ -6,6 +6,28 @@
 
 Checks automate objective enforcement of [Eceni Laws](LAWS.md) where doing so is reliable and proportionate. A Check does not define Governance and cannot waive, reinterpret or replace the Law it supports.
 
+## CHK-QUA-001 — Maintained Source Meets Mechanical Standards
+
+**Introduced in Governance baseline:** 1.3.0
+
+**Implements:** [QUA-001](LAWS.md#qua-001--follow-the-applicable-implementation-guide), proposed [QUA-003](LAWS.md#qua-003--source-is-human-usable-and-intent-is-discoverable), the [C# implementation guide](guides/CSHARP.md) and the [MariaDB implementation guide](guides/MARIADB.md)
+
+**Status:** Specified; not implemented
+
+**Initial implementation target:** Repository configuration, compiler/analysers and Harness orchestration
+
+For new and materially changed governed source:
+
+1. Run the technology's formatter, compiler and adopted static analysers.
+2. Reject new unapproved violations of objective naming, acronym, typing, documentation-presence and suppression rules.
+3. Validate objective database rules including object and parameter naming, explicit routine security, explicit join forms, unsafe dynamic SQL and expected row-metadata shape where applicable.
+4. Identify the exact source revision, guide version, tool configuration and governed scope in the result.
+5. Preserve existing out-of-scope findings in an immutable baseline where immediate bulk remediation would be disproportionate.
+
+Generated, vendored and externally controlled source must be classified deterministically where it is excluded from ordinary enforcement. Changing analyser configuration, scope or an existing-finding baseline is a governed change and must not silently make a failing result pass.
+
+The Check proves only objective conformance within its declared coverage. It must not claim that documentation is useful, that design intent is sufficient, that a database relationship was classified correctly or that source is understandable merely because mechanical checks pass. Those outcomes require proportionate review.
+
 ## CHK-GOV-001 — Parent Issues with Open Sub-Issues Remain Open
 
 **Implements:** [GOV-001](LAWS.md#gov-001--departures-follow-a-governed-lifecycle)

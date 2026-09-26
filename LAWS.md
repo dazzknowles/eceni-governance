@@ -459,3 +459,48 @@ Automation may detect the introduction of new language, runtime, framework, data
 ### Basis
 
 Implements [**Bounded Autonomy**](COMMANDMENTS.md#1-bounded-autonomy), [**Pay for a Lesson Once**](COMMANDMENTS.md#5-pay-for-a-lesson-once) and [**Build Quality In**](COMMANDMENTS.md#6-build-quality-in). The [first Eceni Harness slice](https://github.com/dazzknowles/eceni-harness/commit/3e9ea51) demonstrated the gap by establishing Python as a maintained runtime without a Harness technology baseline or an explicit design-authority decision. The implementation may be useful, but suitability after the choice is not authority to make it.
+
+## QUA-003 — Source Is Human-Usable and Intent Is Discoverable
+
+**Introduced in Governance baseline:** 1.3.0
+
+> Maintained source must support efficient, safe work by a competent human using the technology's standard tooling. Its contracts must be discoverable, and material non-obvious intent and constraints must be preserved in the most appropriate durable form.
+
+Use names, types, interfaces and structure to communicate ordinary intent directly. Preserve additional explanation where a competent maintainer could not otherwise understand, change, verify or operate the work safely. The appropriate authoritative form may be:
+
+- idiomatic contract documentation exposed through normal tooling;
+- a focused source or configuration comment;
+- an accepted specification or requirement;
+- a decision record for a cross-cutting choice or rejected alternative;
+- a meaningfully named and traceable test;
+- a runbook or another versioned operational artefact.
+
+Do not duplicate the same explanation mechanically across several places. Retain one authoritative home and stable references where other artefacts depend on it. Commit history, transient chat and private recollection are not sufficient homes for intent that remains necessary to maintain the current system.
+
+Contract documentation and comments must explain useful purpose, behaviour, constraints, consequences or reasoning. They must not merely restate a declaration or narrate obvious syntax. Particularly complex implementation may need a concise explanation of what it does as well as why it exists.
+
+### Applicability
+
+Eceni-authored and Eceni-maintained source code, database definitions, configuration, infrastructure definitions, scripts, tests and code-facing contracts.
+
+New source, newly exposed contracts and materially changed areas must comply. Untouched inherited source may remain outside the assessed scope, but the project must not represent that unassessed source as compliant. Where Eceni assumes maintenance responsibility for generated, vendored or inherited work, it must identify the authoritative source and the boundary of its responsibility.
+
+Generated or externally controlled source need not be rewritten when its origin is identifiable, its authoritative input or generator remains maintainable and its contracts remain discoverable through an appropriate mechanism.
+
+### Exceptions
+
+A bounded exception is permitted where an externally controlled format, framework or tool makes the ordinary mechanism unavailable or would produce a materially worse result. Record the exact scope, constraint, alternative means of discoverability and maintenance consequence under GOV-001.
+
+Urgent diagnosis, containment or restoration work may defer missing documentation only where documenting first would materially worsen the immediate outcome. The obligation remains owned and trackable, is not Pass under EVI-001, and must be completed when the change is stable before the work is accepted as ordinarily complete.
+
+### Required evidence
+
+The exact source and applicable guide revisions; compiler, analyser or structural results where available; the authoritative intent artefact or self-explanatory contract; and proportionate review of whether a future competent maintainer can find and use the necessary information without private knowledge or mandatory access to an AI system.
+
+### Checks
+
+Automation may verify required documentation presence, valid references, identifier form, generated-source classification and other objective guide rules. It cannot determine whether names, comments or documentation communicate sufficient and accurate intent; that remains a review judgement. Comment counts and documentation word counts are not evidence of compliance.
+
+### Basis
+
+Implements [**Pay for a Lesson Once**](COMMANDMENTS.md#5-pay-for-a-lesson-once) and [**Build Quality In**](COMMANDMENTS.md#6-build-quality-in). It consolidates the useful outcomes identified by Rio's draft [Human-Usable Source](https://github.com/riosystems/rioit-governance/wiki/RIO-LAW-ENG-003-Human-Usable-Source) and [Discoverable Design Intent](https://github.com/riosystems/rioit-governance/wiki/RIO-LAW-ENG-002-Discoverable-Design-Intent) work without importing Rio's governance structure or treating its drafts as Eceni authority.

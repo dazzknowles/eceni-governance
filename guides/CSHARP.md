@@ -1,20 +1,33 @@
 # C# Implementation Guide
 
-**Guide version:** 1.0.0
+**Guide version:** 1.1.0
 
 **Introduced in Governance baseline:** 1.1.0
 
-**Governing Law:** [QUA-001](../LAWS.md#qua-001--follow-the-applicable-implementation-guide)
+**Revised in Governance baseline:** 1.3.0
+
+**Governing Laws:** [QUA-001](../LAWS.md#qua-001--follow-the-applicable-implementation-guide) and [QUA-003](../LAWS.md#qua-003--source-is-human-usable-and-intent-is-discoverable)
 
 ## Scope
 
-This guide applies to hand-authored C# source and tests. Generated code and externally imposed source formats are outside its scope when their origin is identifiable.
+This guide applies to hand-authored and Eceni-maintained C# source and tests. New files comply completely. New and materially changed declarations in existing files comply from the project's adopted source baseline; untouched inherited source is not thereby represented as compliant.
+
+Generated, vendored and externally imposed source is outside ordinary enforcement when its origin is identifiable and it is not hand-maintained. Its generator, templates, maintained inputs and Eceni-authored partial files remain governed.
 
 ## Types are explicit
 
-Declare the type of every local variable explicitly. Do not use `var`.
+Declare the type of every local variable explicitly. Do not use `var` where C# provides a viable explicit type.
 
 Explicit types make data shape and numeric or nullable semantics visible at the point of use and reduce the work required to understand code during review.
+
+Target-typed construction is compliant because the declared type remains visible:
+
+```csharp
+Product product = new();
+List<Product> products = [];
+```
+
+Use `var` only where the language requires type inference, such as for an anonymous type. Intentional dynamic binding is declared as `dynamic`; `var` is not a synonym for `dynamic`. A repeated need for another permitted case should become an explicit guide rule rather than an informal local convention.
 
 ## Naming
 
@@ -25,21 +38,26 @@ Explicit types make data shape and numeric or nullable semantics visible at the 
 - Suffix asynchronous methods with `Async`.
 - Choose names that describe domain meaning rather than implementation mechanics.
 - Avoid abbreviations unless they are established domain or technical terminology.
-- Use one spelling consistently for an established abbreviation within a public model; do not create parallel forms such as `Id` and `ID` for the same concept without a governed compatibility reason.
-- Include units or time basis where omission could mislead, such as `timeoutSeconds`, `sizeBytes` or `createdAtUtc`.
+- Preserve the conventional written form of established acronyms within identifiers, including `ID`, `UTC`, `HTTP`, `PV` and `VAT`.
+- Combine acronym forms with normal identifier casing: `ProductID`, `productID`, `_productID` and `VATRate`, not `ProductId`, `productId`, `_productId` or `VatRate`.
+- Framework-owned, generated and externally imposed names remain unchanged where renaming would break or obscure their governing contract.
+- Include units or time basis where omission could mislead, such as `timeoutSeconds`, `sizeBytes` or `createdAtUTC`.
 
 ## XML documentation
 
-Use XML documentation for:
+Public and protected types and members are contracts and must use C# XML documentation. Internal members that form contracts across projects or significant component boundaries follow the same rule.
 
-- public types and contracts whose purpose, constraints or consequences are not obvious from their signature;
-- public members whose behaviour, units, nullability, side effects, failure modes or security boundary require explanation;
-- interfaces and extension points consumed across component boundaries;
-- implementation decisions where the reason is important to safe maintenance.
+Inherited or obvious standard contracts, such as an ordinary override, may use `<inheritdoc/>` or an equivalent tool-supported reference rather than duplicate the same explanation.
 
-Document internal or private members when they carry a non-obvious invariant, workaround, evidence limitation or consequential design decision.
+Documentation explains the contract information a consumer or maintainer needs. Explain purpose, expectations, units, nullability, results, material side effects, failure behaviour, security boundaries and complex or conditional parameters where they are not already unambiguous.
 
-Documentation explains intent and constraints; it must not merely restate syntax. Add `<param>`, `<returns>`, `<exception>`, `<remarks>` and `<example>` only when they convey useful information. Keep references and claims current when behaviour changes.
+Use `<param>`, `<typeparam>`, `<returns>`, `<exception>`, `<remarks>` and `<example>` when they communicate useful contract information. Do not add boilerplate that merely repeats a name, type or declaration. Keep references and claims current when behaviour changes.
+
+## Source comments and design intent
+
+Meaningful names, types and structure are the first means of making implementation understandable. Add a focused source comment where a competent maintainer would otherwise have to infer a non-obvious invariant, constraint, workaround, trade-off, evidence limitation, compatibility obligation, failure behaviour or consequential design decision.
+
+Comments normally explain why. Particularly complex code may also need a concise explanation of what it does. Put cross-cutting reasoning in its appropriate authoritative artefact and reference it from the affected source rather than copying a long decision history into a comment.
 
 ## Readability and structure
 
@@ -51,4 +69,6 @@ Documentation explains intent and constraints; it must not merely restate syntax
 
 ## Checks
 
-The absence of `var`, naming rules, formatting and unjustified suppressions are suitable for automated analysis. Documentation usefulness and clarity remain review judgements.
+Uses of `var`, naming and acronym rules, formatting, unjustified suppressions, documentation presence and broken XML references are suitable for compiler or analyser enforcement. Existing findings may be baselined so that enforcement prevents new debt without demanding unrelated bulk cleanup.
+
+Documentation usefulness, naming clarity and whether the right intent is discoverable remain review judgements. Comment or documentation volume is not a quality measure.

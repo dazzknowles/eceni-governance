@@ -1,14 +1,67 @@
 # MariaDB Implementation Guide
 
-**Guide version:** 1.0.0
+**Guide version:** 1.1.0
 
 **Introduced in Governance baseline:** 1.1.0
 
-**Governing Law:** [QUA-001](../LAWS.md#qua-001--follow-the-applicable-implementation-guide)
+**Revised in Governance baseline:** 1.3.0
+
+**Governing Laws:** [QUA-001](../LAWS.md#qua-001--follow-the-applicable-implementation-guide) and [QUA-003](../LAWS.md#qua-003--source-is-human-usable-and-intent-is-discoverable)
 
 ## Scope
 
-This guide applies to Eceni-authored MariaDB schemas, routines, views, migrations and queries.
+This guide applies to Eceni-authored and Eceni-maintained MariaDB schemas, routines, views, migrations and queries. New objects comply completely. New and materially changed definitions in an existing database comply from the project's adopted source baseline; untouched inherited definitions are not thereby represented as compliant.
+
+## Naming and layout
+
+- Use plural `PascalCase` table names, such as `CollectionAttempts`.
+- Use `PascalCase` column names.
+- Preserve the conventional written form of established acronyms, including `ID`, `UTC`, `HTTP`, `PV` and `VAT`: use `DeviceID`, `ObservedAtUTC` and `HTTPStatus`, not `DeviceId`, `ObservedAtUtc` or `HttpStatus`.
+- Name a table's ordinary surrogate primary key `ID`. Name a referencing column for the referenced entity, such as `SiteID` or `CollectionRunID`.
+- Use `esp<Entity><Action>` for Eceni stored procedures, such as `espDeviceGetByID` and `espTelemetryObservationInsert`.
+- Prefix parameters by direction and use `camelCase` after the prefix: `in_deviceID`, `out_collectionRunID` and `inout_attemptCount`.
+- Prefix routine-local variables with `local_` and use `camelCase` after the prefix.
+- Use short but meaningful table aliases. Avoid aliases whose meaning cannot be understood locally.
+- Name keys and constraints using `PK_<Table>`, `FK_<Child>_<ParentOrPurpose>`, `UQ_<Table>_<Purpose>` and `IX_<Table>_<Purpose>`.
+- Match a source-controlled object's filename to its database object name.
+- Write SQL keywords in uppercase and use consistent indentation within the project.
+- Include units or time basis in identifiers where omission could mislead. The standard `CreateDate` and `LastActionDate` names defined below are UTC by contract.
+
+Names describe domain meaning rather than incidental implementation. Avoid abbreviations unless they are established domain or technical terminology.
+
+## Common row metadata
+
+An ordinary user-maintained business table is expected to include these columns unless their purpose genuinely does not apply:
+
+- `Deleted` — a non-null logical deletion flag, ordinarily `TINYINT(1) NOT NULL DEFAULT 0`;
+- `CreateUserID` — the actor responsible for creation;
+- `CreateDate` — the UTC creation time;
+- `LastActionUserID` — the actor responsible for the latest material mutation;
+- `LastActionDate` — the UTC time of the latest material mutation.
+
+Creation metadata is immutable after insertion. Last-action metadata changes only with a material mutation, including logical deletion; reads do not update it. Normal reads exclude logically deleted rows unless the contract explicitly requests them. Physical deletion, retention and uniqueness behaviour for deleted rows must be decided for the affected data rather than inferred from the flag.
+
+Actor columns may identify a human, service or system actor according to the project's identity model. Use an explicit system identity where the model provides one. Null is permitted only where the contract deliberately represents an unknown or unavailable actor.
+
+These columns provide current attribution, not a complete audit history. A requirement to reconstruct changes needs a separately designed audit mechanism that defines actions, actors, timestamps, correlation, retained state, access and sensitive-data treatment.
+
+## Referential integrity distinguishes business data from attribution
+
+Use database-enforced foreign keys by default for genuine business relationships. A business relationship is not left unenforced merely for convenience or because application code currently supplies a valid value.
+
+The standard `CreateUserID` and `LastActionUserID` attribution columns are soft references by default and do not carry foreign keys to the shared user table. Foreign keys from many child tables into that common identity table have previously created disproportionate locking and timeout behaviour. A project may add such a foreign key where its topology and workload show that the integrity benefit outweighs the contention and maintenance cost. The metadata default is intentional, not an accidental omission or a precedent for business relationships.
+
+A soft reference still has a defined target and validation boundary. The application or routine must supply and validate it appropriately, and deletion or retirement of the referenced identity must preserve required attribution. Do not add indexes to every metadata reference mechanically; index them when an evidenced access, integrity or operational need justifies the write and storage cost.
+
+Name foreign keys and their supporting indexes consistently. Assess high-fan-in or high-write relationships using representative concurrency and workload evidence when their locking behaviour may be material.
+
+## Types and nullability are deliberate
+
+- Choose data types, lengths, signedness and numeric precision for the domain and credible range rather than copying an arbitrary default.
+- Use exact numeric types where exact values matter; do not use floating-point storage for money or another exact decimal contract.
+- Use UTC for stored instants unless a requirement explicitly needs another representation. Preserve an original offset or lexical value separately where evidence or user meaning requires it.
+- Make nullability express a defined domain state. Do not use null merely to avoid choosing a default or modelling a state.
+- Select character set and collation deliberately where comparison, ordering, case or international text behaviour can affect correctness.
 
 ## Routine and view security is explicit
 
@@ -84,9 +137,24 @@ For material or disputed paths, use representative query plans, volumes and timi
 - Select named columns rather than `SELECT *` in application-facing code.
 - Qualify columns where more than one source is present.
 - Keep parameter direction and purpose visible through consistent naming.
-- Avoid dynamic SQL unless the requirement cannot be met safely with static SQL; any use requires explicit security review and parameterisation.
+- Treat external values as data and bind them through parameters. Externally influenced table, column, direction or expression choices must come through a closed, validated allow-list rather than becoming executable structure directly.
+- Avoid dynamic SQL unless the requirement cannot be met safely with static SQL; any use requires explicit security review, value parameterisation and controlled structural composition.
 - Comment consequential intent, assumptions and non-obvious performance choices rather than narrating syntax.
+
+## Routine contracts are visible
+
+Routine definitions and their neighbouring documentation must make input and output meaning, result-set shape, no-result behaviour, material side effects, expected failure behaviour and transaction ownership discoverable. Result-set column names and meanings are contracts with their consumers and must not change casually.
+
+Stored procedures should remain independently understandable. Do not create hidden or difficult-to-follow procedure-to-procedure call graphs. A procedure may call another only where the reuse, transaction and failure semantics are clearer than keeping the operation explicit, and the dependency is visible in the source-controlled definitions and review.
+
+## Concurrency and audit mechanisms remain evidence-led
+
+Keep transactions as short as correctness permits, acquire locks in a consistent order where practical and do not hold database locks across user interaction or avoidable external calls. Use locking reads deliberately and make deadlock or concurrency-conflict handling bounded and visible.
+
+Eceni has not yet selected one portfolio-wide row-locking, optimistic-concurrency or audit-history mechanism. Choose the mechanism from an actual consistency and history requirement, record the decision, and promote a reusable pattern only after a real workload such as Solar has exercised it.
 
 ## Checks
 
-Static checks can detect missing `SQL SECURITY`, use of `DEFINER`, shorthand or implicit joins, `SELECT *`, unstable limiting and common unsafe dynamic-SQL patterns. [CHK-DB-001](../CHECKS.md#chk-db-001--database-definitions-match-source) specifies source/deployment drift detection; [CHK-DATA-001](../CHECKS.md#chk-data-001--database-bootstrap-is-reproducible) covers schema and system-data reconstruction. Placement of work between the database and application remains evidence-led engineering judgement.
+Static checks can detect many naming and acronym violations, missing `SQL SECURITY`, use of `DEFINER`, shorthand or implicit joins, `SELECT *`, unstable limiting, unbound values and common unsafe dynamic-SQL patterns. They can also identify missing expected row metadata and unnamed constraints while allowing an explicit non-applicability decision.
+
+[CHK-DB-001](../CHECKS.md#chk-db-001--database-definitions-match-source) specifies source/deployment drift detection; [CHK-DATA-001](../CHECKS.md#chk-data-001--database-bootstrap-is-reproducible) covers schema and system-data reconstruction. Whether a relationship is business data or attribution, whether documentation is useful, and where work should run remain evidence-led engineering judgements.
